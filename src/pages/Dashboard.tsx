@@ -434,6 +434,9 @@ ${order.notes ? `NOT: ${order.notes}` : ''}
         <div className="mb-2 text-xs text-gray-500 flex items-center gap-2">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
           Real-time aktif - Yeni siparişler otomatik görünecek
+          <span className="text-xs bg-blue-100 px-2 py-1 rounded">
+            Toplam: {orders.length} | Aktif: {activeOrders.length}
+          </span>
         </div>
         
         {activeOrders.length === 0 ? (

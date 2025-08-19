@@ -69,11 +69,17 @@ export function useOrders() {
       supabase.removeChannel(subscriptionRef.current);
     }
 
+    console.log('Setting up realtime subscription for orders...');
+    
     subscriptionRef.current = supabase
       .channel('orders-changes')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'orders' },
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'orders'
+        },
         (payload) => {
           console.log('Real-time event received:', payload);
           
@@ -108,12 +114,20 @@ export function useOrders() {
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Subscription status:', status);
+        if (status === 'SUBSCRIBED') {
+          console.log('✅ Successfully subscribed to orders changes');
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error('❌ Channel error - retrying subscription...');
+          // Retry after 5 seconds
+          setTimeout(() => {
+            setupRealtimeSubscription();
+          }, 5000);
+        }
+      });
 
-    // Subscription durumunu kontrol et
-    subscriptionRef.current.on('system', {}, (payload) => {
-      console.log('Subscription status:', payload);
-    });
+    console.log('Realtime subscription setup completed');
   };
 
   const createOrder = async (orderData: {
